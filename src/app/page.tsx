@@ -28,8 +28,8 @@ export default function LeaderboardPage() {
 		fetchData();
 	}, [fetchData]);
 
-	const topTen = useMemo(() => rows.slice(0, 10), [rows]);
-	const rest = useMemo(() => rows.slice(10), [rows]);
+	const topThree = useMemo(() => rows.slice(0, 3), [rows]);
+	const rest = useMemo(() => rows.slice(3), [rows]);
 
 	return (
 		<div className="min-h-screen relative overflow-hidden">
@@ -139,7 +139,7 @@ export default function LeaderboardPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8, delay: 0.2 }}
 						>
-							{/* Top 10 Cards */}
+							{/* Top 3 Cards */}
 							<section className="mb-16">
 								<motion.h2
 									initial={{ opacity: 0, x: -20 }}
@@ -148,10 +148,10 @@ export default function LeaderboardPage() {
 									className="text-2xl font-bold text-white mb-8 flex items-center gap-3"
 								>
 									<span className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center text-black font-black text-sm">🏆</span>
-									Top Creators
+									Top 3 Creators
 								</motion.h2>
-								<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-									{topTen.map((r, index) => (
+								<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+									{topThree.map((r, index) => (
 										<motion.div
 											key={r.rank}
 											initial={{ opacity: 0, y: 20 }}
@@ -165,7 +165,7 @@ export default function LeaderboardPage() {
 								</div>
 							</section>
 
-							{/* Positions 11-100 Table */}
+							{/* Full Leaderboard Table (Positions 4-100) */}
 							{rest.length > 0 && (
 								<section>
 									<motion.h2
@@ -175,7 +175,7 @@ export default function LeaderboardPage() {
 										className="text-2xl font-bold text-white mb-8 flex items-center gap-3"
 									>
 										<span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-black text-sm">📋</span>
-										Positions 11–100
+										Full Leaderboard (Top 100)
 									</motion.h2>
 									<motion.div
 										initial={{ opacity: 0, y: 20 }}

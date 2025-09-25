@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
         // Convert to array and sort by score
         const leaderboard = Array.from(userScores.values())
           .sort((a, b) => b.score - a.score)
-          .slice(0, 10)
+          .slice(0, 100)
           .map((user, index) => ({
             rank: index + 1,
             ...user

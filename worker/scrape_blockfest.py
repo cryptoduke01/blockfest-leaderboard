@@ -8,7 +8,8 @@ from psycopg2.extras import execute_values
 from dotenv import load_dotenv
 import requests
 
-load_dotenv()
+# Load environment variables from the main project directory
+load_dotenv(dotenv_path="../.env.local")
 
 DB_URL = os.getenv("SUPABASE_DB_URL")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
