@@ -81,7 +81,7 @@ export default function LeaderboardPage() {
 								transition={{ duration: 0.8, delay: 0.4 }}
 								className="text-white/80 text-lg max-w-2xl"
 							>
-								Top creators talking about Blockfest — live rankings and real-time engagement
+								Top creators talking about Blockfest — Live rankings and Real-Time engagement
 							</motion.p>
 						</div>
 						<motion.div
