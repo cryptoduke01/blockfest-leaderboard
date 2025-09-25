@@ -1,6 +1,0 @@
-#!/bin/bash
-cd /home/duke-sol/Desktop/workspace/blockestboard/worker
-source .venv/bin/activate
-export SUPABASE_URL=https://pyyvgdhnvsilznrtsvdj.supabase.co
-export SUPABASE_SERVICE_ROLE=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5eXZnZGhudnNpbHpucnRzdmRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc0MjcyMywiZXhwIjoyMDc0MzE4NzIzfQ.vvVTCQ6yFHLUtWR3BEhMUAAkWqiM000xxdrrZLqBxcY
-python3 scrape_blockfest.py
