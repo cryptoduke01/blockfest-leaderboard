@@ -16,7 +16,8 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE")
 QUERY = "blockfest OR #blockfest OR #blockfestafrica"
 SINCE_HOURS = int(os.getenv("SCRAPE_SINCE_HOURS", "24"))
-LIMIT = int(os.getenv("SCRAPE_LIMIT", "500"))
+LIMIT = int(os.getenv("SCRAPE_LIMIT", "100"))
+LAST_RUN_FILE = os.path.join(os.path.dirname(__file__), ".last_scrape_at")
 
 # Real Twitter API integration using Twitter API v2
 def fetch_tweets(query: str, since: datetime, limit: int):
@@ -127,7 +128,6 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 			
 	except Exception as e:
 		print(f"Error fetching tweets: {e}")
-		# Fallback to mock data
 		print("Falling back to mock data...")
 		mock_tweets = [
 			{
@@ -164,49 +164,21 @@ def to_row(tweet):
 	)
 
 
-def insert_via_supabase_api(rows):
-	"""Insert via Supabase REST API as fallback"""
-	if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
-		raise SystemExit("SUPABASE_URL and SUPABASE_SERVICE_ROLE must be set for API fallback")
-	
-	headers = {
-		"apikey": SUPABASE_SERVICE_KEY,
-		"Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-		"Content-Type": "application/json"
-	}
-	
-	# Insert one by one to handle conflicts
-	inserted = 0
-	for row in rows:
-		data = {
-			"tweet_id": row[0],
-			"username": row[1], 
-			"profile_pic": row[2],
-			"text": row[3],
-			"date": row[4].isoformat(),
-			"likes": row[5],
-			"retweets": row[6],
-			"replies": row[7],
-			"quotes": row[8],
-			"followers": row[9]
-		}
-		
-		response = requests.post(
-			f"{SUPABASE_URL}/rest/v1/tweets",
-			headers=headers,
-			json=data,
-			params={"on_conflict": "tweet_id"}
-		)
-		
-		if response.status_code in [200, 201, 409]:  # 409 = conflict (already exists)
-			inserted += 1
-		else:
-			print(f"Failed to insert {row[0]}: {response.status_code} {response.text}")
-	
-	print(f"Inserted {inserted} rows via Supabase API")
-	return inserted
-
 def main():
+	# 24h guard unless FORCE_RUN=1
+	try:
+		if os.getenv("FORCE_RUN") != "1" and os.path.exists(LAST_RUN_FILE):
+			with open(LAST_RUN_FILE, "r") as f:
+				last = float(f.read().strip() or "0")
+				if time.time() - last < 24 * 3600:
+					print("Skip: last scrape happened less than 24h ago")
+					return
+	except Exception:
+		pass
+
+	if not DB_URL and not (SUPABASE_URL and SUPABASE_SERVICE_KEY):
+		raise SystemExit("Supabase credentials not set")
+
 	since = datetime.now(timezone.utc) - timedelta(hours=SINCE_HOURS)
 
 	rows = [to_row(t) for t in fetch_tweets(QUERY, since, LIMIT)]
@@ -214,14 +186,9 @@ def main():
 		print("No tweets fetched")
 		return
 
-	# Try direct Postgres connection first
 	if DB_URL:
 		try:
-			conn_params = {
-				'dsn': DB_URL,
-				'sslmode': 'require'
-			}
-			conn = psycopg2.connect(**conn_params)
+			conn = psycopg2.connect(dsn=DB_URL, sslmode='require')
 			conn.autocommit = True
 			with conn.cursor() as cur:
 				sql = (
@@ -231,13 +198,44 @@ def main():
 				execute_values(cur, sql, rows, page_size=500)
 				print(f"Inserted {len(rows)} rows via Postgres (deduped by tweet_id)")
 			conn.close()
-			return
 		except Exception as e:
 			print(f"Postgres connection failed: {e}")
 			print("Falling back to Supabase API...")
-	
+
 	# Fallback to Supabase REST API
-	insert_via_supabase_api(rows)
+	if SUPABASE_URL and SUPABASE_SERVICE_KEY:
+		headers = {
+			"apikey": SUPABASE_SERVICE_KEY,
+			"Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+			"Content-Type": "application/json",
+		}
+		inserted = 0
+		for row in rows:
+			data = {
+				"tweet_id": row[0],
+				"username": row[1],
+				"profile_pic": row[2],
+				"text": row[3],
+				"date": row[4].isoformat() if hasattr(row[4], 'isoformat') else row[4],
+				"likes": row[5],
+				"retweets": row[6],
+				"replies": row[7],
+				"quotes": row[8],
+				"followers": row[9],
+			}
+			resp = requests.post(f"{SUPABASE_URL}/rest/v1/tweets", headers=headers, json=data, params={"on_conflict": "tweet_id"})
+			if resp.status_code in (200, 201, 409):
+				inserted += 1
+			else:
+				print("Insert failed:", resp.status_code, resp.text)
+		print(f"Inserted {inserted} rows via Supabase API")
+
+	# write last run time
+	try:
+		with open(LAST_RUN_FILE, "w") as f:
+			f.write(str(time.time()))
+	except Exception:
+		pass
 
 
 if __name__ == "__main__":

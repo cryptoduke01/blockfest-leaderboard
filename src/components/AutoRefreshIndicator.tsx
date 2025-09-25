@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export function AutoRefreshIndicator({ seconds = 60, onElapsed }: { seconds?: number; onElapsed: () => void }) {
   const [remaining, setRemaining] = useState(seconds);
   const progress = ((seconds - remaining) / seconds) * 100;
-
+  
   useEffect(() => {
     setRemaining(seconds);
     const id = setInterval(() => {
@@ -22,7 +22,7 @@ export function AutoRefreshIndicator({ seconds = 60, onElapsed }: { seconds?: nu
   }, [remaining, seconds, onElapsed]);
 
   return (
-    <motion.div
+    <motion.div 
       className="glass rounded-xl p-3 flex items-center gap-3 min-w-[200px]"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}

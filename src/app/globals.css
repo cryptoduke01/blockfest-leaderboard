@@ -1,57 +1,45 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.cdnfonts.com/css/br-sonoma');
 
 :root {
   /* Blockfest Official Color Palette from Logo */
   --blockfest-black: #000000;
-  --blockfest-white: #ffffff;
-  --blockfest-red: #e91e63; /* Magenta-red from logo */
-  --blockfest-blue: #2196f3; /* Bright blue from logo */
-  --blockfest-teal: #00bcd4; /* Teal from the "3" outline */
-  --blockfest-yellow: #ffeb3b; /* Bright yellow from logo */
-  --blockfest-gray: #1a1a1a;
-  --blockfest-gray-light: #2a2a2a;
-
+  --blockfest-white: #FFFFFF;
+  --blockfest-red: #E91E63;        /* Magenta-red from logo */
+  --blockfest-blue: #2196F3;       /* Bright blue from logo */
+  --blockfest-teal: #00BCD4;       /* Teal from the "3" outline */
+  --blockfest-yellow: #FFEB3B;     /* Bright yellow from logo */
+  --blockfest-gray: #1A1A1A;
+  --blockfest-gray-light: #2A2A2A;
+  
   /* Glass effect variables */
   --glass-bg: rgba(0, 0, 0, 0.4);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
+  
   /* Official Blockfest Gradients */
-  --gradient-primary: linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%);
-  --gradient-red: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
-  --gradient-blue: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-  --gradient-teal: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
-  --gradient-bg: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-  --gradient-rainbow: linear-gradient(
-    135deg,
-    #e91e63 0%,
-    #2196f3 25%,
-    #00bcd4 50%,
-    #ffeb3b 75%,
-    #e91e63 100%
-  );
+  --gradient-primary: linear-gradient(135deg, #FFEB3B 0%, #FFC107 100%);
+  --gradient-red: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);
+  --gradient-blue: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  --gradient-teal: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+  --gradient-bg: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
+  --gradient-rainbow: linear-gradient(135deg, #E91E63 0%, #2196F3 25%, #00BCD4 50%, #FFEB3B 75%, #E91E63 100%);
 }
 
 @theme inline {
   --color-background: var(--blockfest-black);
   --color-foreground: var(--blockfest-white);
-  --font-sans: "Inter", var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: 'BR Sonoma', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--gradient-bg);
   color: var(--blockfest-white);
-  font-family: "Inter", var(--font-geist-sans), system-ui, sans-serif;
+  font-family: 'BR Sonoma', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -60,84 +48,22 @@ body {
 }
 
 /* Glass morphism utility classes */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
-
-.glass-strong {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-}
+.glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+.glass-strong { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--blockfest-gray);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--blockfest-gold);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #ffa500;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--blockfest-gray); }
+::-webkit-scrollbar-thumb { background: var(--blockfest-yellow); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #FFA500; }
 
 /* Smooth transitions for all interactive elements */
-* {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+* { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-/* Custom animations */
-@keyframes glow {
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes pulse-gold {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.glow-animation {
-  animation: glow 2s ease-in-out infinite;
-}
-
-.float-animation {
-  animation: float 3s ease-in-out infinite;
-}
-
-.pulse-gold {
-  animation: pulse-gold 2s ease-in-out infinite;
-}
+/* Animations */
+@keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); } 50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); } }
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+@keyframes pulse-gold { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+.glow-animation { animation: glow 2s ease-in-out infinite; }
+.float-animation { animation: float 3s ease-in-out infinite; }
+.pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }

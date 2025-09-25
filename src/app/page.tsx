@@ -11,6 +11,7 @@ export default function LeaderboardPage() {
 	const [period, setPeriod] = useState<Period>("daily");
 	const [rows, setRows] = useState<LeaderboardRow[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
 	const fetchData = useCallback(async () => {
 		setLoading(true);
@@ -18,6 +19,7 @@ export default function LeaderboardPage() {
 			const res = await fetch(`/api/leaderboard?period=${period}`, { cache: "no-store" });
 			const data = await res.json();
 			setRows(Array.isArray(data) ? (data as LeaderboardRow[]) : []);
+			setLastUpdated(new Date());
 		} catch {
 			setRows([]);
 		}
@@ -92,6 +94,7 @@ export default function LeaderboardPage() {
 						>
 							<FilterTabs value={period} onChange={setPeriod} />
 							<AutoRefreshIndicator onElapsed={fetchData} />
+							<div className="text-xs text-white/60">Data refreshes every 24h • {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : "Loading"}</div>
 						</motion.div>
 					</div>
 				</motion.header>
