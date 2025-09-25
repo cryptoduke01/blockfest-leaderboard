@@ -59,13 +59,11 @@ export default function LeaderboardPage() {
 								transition={{ duration: 0.8, delay: 0.2 }}
 								className="flex items-center gap-6"
 							>
-								{/* Official Blockfest Logo Recreation */}
+								{/* Minimal logo grid (no numeral) */}
 								<div className="w-16 h-16 grid grid-cols-2 gap-1">
 									<div className="w-6 h-6 bg-red-500 rounded-sm"></div>
 									<div className="w-6 h-6 bg-blue-500 rounded-sm"></div>
-									<div className="w-6 h-6 bg-teal-400 rounded-sm flex items-center justify-center">
-										<span className="text-black font-black text-xs">3</span>
-									</div>
+									<div className="w-6 h-6 bg-teal-400 rounded-sm"></div>
 									<div className="w-6 h-6 bg-yellow-400 rounded-sm"></div>
 								</div>
 								<div>
@@ -90,7 +88,7 @@ export default function LeaderboardPage() {
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.8, delay: 0.6 }}
-							className="flex flex-col sm:flex-row items-center gap-4"
+							className="flex flex-col sm:flex-row items-center gap-3"
 						>
 							<FilterTabs value={period} onChange={setPeriod} />
 							<AutoRefreshIndicator onElapsed={fetchData} />
