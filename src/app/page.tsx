@@ -40,8 +40,8 @@ export default function LeaderboardPage() {
 		);
 	}, [rows, searchQuery]);
 
-	const topThree = useMemo(() => filteredRows.slice(0, 3), [filteredRows]);
-	const rest = useMemo(() => filteredRows.slice(3), [filteredRows]);
+    const topTwo = useMemo(() => filteredRows.slice(0, 2), [filteredRows]);
+    const rest = useMemo(() => filteredRows.slice(2), [filteredRows]);
 
 	return (
 		<div className="min-h-screen relative overflow-hidden">
@@ -154,7 +154,7 @@ export default function LeaderboardPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8, delay: 0.2 }}
 						>
-							{/* Top 3 Cards */}
+                            {/* Top 2 Cards */}
 							<section className="mb-16">
 								<motion.h2
 									initial={{ opacity: 0, x: -20 }}
@@ -163,10 +163,10 @@ export default function LeaderboardPage() {
 									className="text-2xl font-bold text-white mb-8 flex items-center gap-3"
 								>
 									<span className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center text-black font-black text-sm">🏆</span>
-									Top 3 Creators
+                                    Top Creators
 								</motion.h2>
-								<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-									{topThree.map((r, index) => (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {topTwo.map((r, index) => (
 										<motion.div
 											key={r.rank}
 											initial={{ opacity: 0, y: 20 }}

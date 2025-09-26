@@ -26,7 +26,7 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 			whileHover={{ y: -6 }}
 			whileTap={{ scale: 0.98 }}
 		>
-			<div className="flex items-center gap-4 sm:gap-6 w-full justify-between">
+			<div className="flex items-center gap-5 sm:gap-7 w-full justify-between">
 				<div className="relative shrink-0">
 					<div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${getRankColor(row.rank)} flex items-center justify-center shadow-md`}>
 						<span className="text-xl sm:text-2xl">{getRankIcon(row.rank)}</span>
@@ -40,14 +40,14 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 					<UserAvatar src={row.profile_pic} alt={row.username} size={56} />
 				</div>
 
-				<div className="flex-1 min-w-0">
-					<Link href={`https://x.com/${handle}`} target="_blank" className="font-bold text-base sm:text-lg truncate hover:text-yellow-400">
+				<div className="flex-1 min-w-0 pr-6">
+					<Link href={`https://x.com/${handle}`} target="_blank" className="font-bold text-base sm:text-lg hover:text-yellow-400 block whitespace-normal break-words leading-tight">
 						{row.username}
 					</Link>
-					<div className="text-xs sm:text-sm text-white/60">{(row.mindshare ?? 0).toFixed(1)}% mindshare</div>
+					<div className="text-xs sm:text-sm text-white/60 mt-0.5">{(row.mindshare ?? 0).toFixed(1)}% mindshare</div>
 				</div>
 
-				<div className="text-right ml-auto min-w-[90px] whitespace-nowrap">
+				<div className="text-right ml-auto min-w-[96px] whitespace-nowrap">
 					<div className="text-sm sm:text-base font-semibold leading-none">{row.followers.toLocaleString()}</div>
 					<div className="text-[10px] sm:text-xs text-white/60 leading-none mt-1">followers</div>
 				</div>
