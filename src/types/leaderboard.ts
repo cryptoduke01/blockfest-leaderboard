@@ -9,6 +9,7 @@ export type LeaderboardRow = {
 	retweets: number;
 	replies: number;
 	quotes: number;
+	followers: number;
 };
 
 export type Period = "daily" | "weekly";

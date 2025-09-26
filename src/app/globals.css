@@ -33,13 +33,12 @@
 @theme inline {
   --color-background: var(--blockfest-black);
   --color-foreground: var(--blockfest-white);
-  --font-sans: 'BR Sonoma', sans-serif;
+  --font-sans: 'BR Sonoma', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  --font-mono: var(--font-geist-mono);
 }
 
 * {
   box-sizing: border-box;
-  font-family: 'BR Sonoma', sans-serif;
-
 }
 
 html {
@@ -49,7 +48,7 @@ html {
 body {
   background: var(--gradient-bg);
   color: var(--blockfest-white);
-  font-family: 'BR Sonoma', sans-serif;                  
+  font-family: 'BR Sonoma', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;

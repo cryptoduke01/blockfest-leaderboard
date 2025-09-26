@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LeaderboardRow } from "@/types/leaderboard";
@@ -49,8 +48,8 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 				</div>
 
 				<div className="text-right min-w-[60px]">
-					<div className="text-sm sm:text-base font-semibold">{row.tweets}</div>
-					<div className="text-[10px] sm:text-xs text-white/60">tweets</div>
+					<div className="text-sm sm:text-base font-semibold">{row.followers.toLocaleString()}</div>
+					<div className="text-[10px] sm:text-xs text-white/60">followers</div>
 				</div>
 			</div>
 		</motion.div>

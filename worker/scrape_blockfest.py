@@ -14,7 +14,7 @@ load_dotenv(dotenv_path="../.env.local")
 DB_URL = os.getenv("SUPABASE_DB_URL")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE")
-QUERY = "blockfest OR #blockfest OR #blockfestafrica"
+QUERY = "blockfest africa OR #blockfestafrica OR #blockfest -is:retweet lang:en"
 SINCE_HOURS = int(os.getenv("SCRAPE_SINCE_HOURS", "24"))
 LIMIT = int(os.getenv("SCRAPE_LIMIT", "100"))
 LAST_RUN_FILE = os.path.join(os.path.dirname(__file__), ".last_scrape_at")
@@ -33,29 +33,44 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 	
 	if not BEARER_TOKEN:
 		print("No Twitter Bearer Token found. Using mock data...")
-		# Generate more realistic mock data
+		# Generate more realistic mock data with special accounts
 		mock_tweets = []
 		usernames = [
-			"@blockfest_africa", "@crypto_king", "@web3_dev", "@blockchain_builder",
-			"@defi_enthusiast", "@nft_creator", "@dao_member", "@metaverse_builder",
-			"@layer2_expert", "@consensus_engineer", "@smart_contract_dev", "@dapp_builder",
-			"@crypto_trader", "@blockchain_analyst", "@web3_consultant", "@defi_researcher",
-			"@nft_artist", "@dao_governor", "@metaverse_architect", "@layer2_developer"
+			"@samuelxeus", "@blockfestafrica", "@thenirvanacad", "@xeusthegreat",
+			"@crypto_king", "@web3_dev", "@blockchain_builder", "@defi_enthusiast", 
+			"@nft_creator", "@dao_member", "@metaverse_builder", "@layer2_expert",
+			"@consensus_engineer", "@smart_contract_dev", "@dapp_builder", "@crypto_trader",
+			"@blockchain_analyst", "@web3_consultant", "@defi_researcher", "@nft_artist"
 		]
 		
 		for i in range(min(limit, 20)):
 			username = usernames[i % len(usernames)]
+			
+			# Special content for special accounts
+			if username in ["@samuelxeus", "@blockfestafrica", "@thenirvanacad", "@xeusthegreat"]:
+				content = f"🚀 Blockfest Africa 2025 is going to be absolutely incredible! The energy, the community, the innovation - this is where Africa's Web3 future takes center stage! 🔥 #blockfestafrica #blockfest #web3 #africa"
+				likes = 500 + (i * 100) + (hash(username) % 200)
+				retweets = 100 + (i * 20) + (hash(username) % 50)
+				quotes = 50 + (i * 10) + (hash(username) % 25)
+				followers = 10000 + (i * 2000) + (hash(username) % 10000)
+			else:
+				content = f"Blockfest is absolutely incredible! The energy here is unmatched 🔥 #blockfest #blockfestafrica #{username.replace('@', '')}"
+				likes = 50 + (i * 15) + (hash(username) % 100)
+				retweets = 10 + (i * 3) + (hash(username) % 20)
+				quotes = 2 + (i * 1) + (hash(username) % 5)
+				followers = 1000 + (i * 200) + (hash(username) % 5000)
+			
 			mock_tweets.append({
 				"id": f"realistic_{i}_{int(time.time())}",
 				"username": username,
 				"profile_pic": f"https://i.pravatar.cc/100?img={i+1}",
-				"content": f"Blockfest is absolutely incredible! The energy here is unmatched 🔥 #blockfest #blockfestafrica #{username.replace('@', '')}",
+				"content": content,
 				"date": datetime.now(timezone.utc) - timedelta(hours=i*2),
-				"likes": 50 + (i * 15) + (hash(username) % 100),
-				"retweets": 10 + (i * 3) + (hash(username) % 20),
-				"replies": 5 + (i * 2) + (hash(username) % 10),
-				"quotes": 2 + (i * 1) + (hash(username) % 5),
-				"followers": 1000 + (i * 200) + (hash(username) % 5000)
+				"likes": likes,
+				"retweets": retweets,
+				"replies": 0,  # No replies for original tweets
+				"quotes": quotes,
+				"followers": followers
 			})
 		
 		for tweet in mock_tweets:
@@ -67,7 +82,7 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 		client = tweepy.Client(bearer_token=BEARER_TOKEN)
 		
 		# Search for tweets
-		search_query = f"{query} -is:retweet lang:en"
+		search_query = query
 		tweets = client.search_recent_tweets(
 			query=search_query,
 			max_results=min(limit, 100),  # Twitter API limit
@@ -142,9 +157,9 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 				"quotes": 5 + i,
 				"followers": 1000 + (i * 100)
 			}
-			for i in range(1, min(limit + 1, 11))
+			for i in range(1, min(limit + 1, 11))																																																																																																																																																																						
 		]
-		
+
 		for tweet in mock_tweets:
 			yield tweet
 

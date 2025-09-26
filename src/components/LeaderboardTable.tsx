@@ -13,7 +13,7 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
               <th className="py-4 px-6 text-left text-sm font-semibold text-white/80 uppercase tracking-wider">Rank</th>
               <th className="py-4 px-6 text-left text-sm font-semibold text-white/80 uppercase tracking-wider">Creator</th>
               <th className="py-4 px-6 text-right text-sm font-semibold text-white/80 uppercase tracking-wider">Mindshare</th>
-              <th className="py-4 px-6 text-right text-sm font-semibold text-white/80 uppercase tracking-wider">Tweets</th>
+              <th className="py-4 px-6 text-right text-sm font-semibold text-white/80 uppercase tracking-wider">Followers</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -34,7 +34,7 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                   </div>
                 </td>
                 <td className="py-4 px-6 text-right"><div className="text-sm font-semibold">{(r.mindshare ?? 0).toFixed(2)}%</div></td>
-                <td className="py-4 px-6 text-right"><div className="text-white/80 font-medium">{r.tweets}</div><div className="text-xs text-white/60">tweets</div></td>
+                <td className="py-4 px-6 text-right"><div className="text-white/80 font-medium">{r.followers.toLocaleString()}</div><div className="text-xs text-white/60">followers</div></td>
               </motion.tr>
             ))}
           </tbody>
@@ -57,7 +57,7 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-[11px] text-white/60">{r.tweets} tweets</div>
+                <div className="text-[11px] text-white/60">{r.followers.toLocaleString()} followers</div>
               </div>
             </motion.div>
           ))}

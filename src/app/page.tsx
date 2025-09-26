@@ -12,6 +12,7 @@ export default function LeaderboardPage() {
 	const [rows, setRows] = useState<LeaderboardRow[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+	const [searchQuery, setSearchQuery] = useState<string>("");
 
 	const fetchData = useCallback(async () => {
 		setLoading(true);
@@ -30,8 +31,16 @@ export default function LeaderboardPage() {
 		fetchData();
 	}, [fetchData]);
 
-	const topThree = useMemo(() => rows.slice(0, 3), [rows]);
-	const rest = useMemo(() => rows.slice(3), [rows]);
+	// Filter rows based on search query
+	const filteredRows = useMemo(() => {
+		if (!searchQuery.trim()) return rows;
+		return rows.filter(row => 
+			row.username.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+	}, [rows, searchQuery]);
+
+	const topThree = useMemo(() => filteredRows.slice(0, 3), [filteredRows]);
+	const rest = useMemo(() => filteredRows.slice(3), [filteredRows]);
 
 	return (
 		<div className="min-h-screen relative overflow-hidden">
@@ -81,7 +90,7 @@ export default function LeaderboardPage() {
 								transition={{ duration: 0.8, delay: 0.4 }}
 								className="text-white/80 text-lg max-w-2xl"
 							>
-								Top creators talking about Blockfest — Live rankings and Real-Time engagement
+								Top creators talking about Blockfest — live rankings and real-time engagement
 							</motion.p>
 						</div>
 						<motion.div
@@ -96,6 +105,29 @@ export default function LeaderboardPage() {
 						</motion.div>
 					</div>
 				</motion.header>
+
+				{/* Search Bar */}
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.8 }}
+					className="glass-strong rounded-2xl p-6 mb-8"
+				>
+					<div className="flex items-center gap-4">
+						<div className="flex-1">
+							<input
+								type="text"
+								placeholder="Search creators by username..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50"
+							/>
+						</div>
+						<div className="text-sm text-white/60">
+							{searchQuery ? `${filteredRows.length} results` : `${rows.length} total`}
+						</div>
+					</div>
+				</motion.div>
 
 				{/* Loading state */}
 				<AnimatePresence>
