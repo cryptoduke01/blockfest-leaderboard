@@ -26,7 +26,7 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 			whileHover={{ y: -6 }}
 			whileTap={{ scale: 0.98 }}
 		>
-			<div className="flex items-center gap-4 sm:gap-6">
+			<div className="flex items-center gap-4 sm:gap-6 w-full justify-between">
 				<div className="relative shrink-0">
 					<div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${getRankColor(row.rank)} flex items-center justify-center shadow-md`}>
 						<span className="text-xl sm:text-2xl">{getRankIcon(row.rank)}</span>
@@ -36,7 +36,7 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 					</div>
 				</div>
 
-				<div className="rounded-xl overflow-hidden">
+				<div className="rounded-xl overflow-hidden shrink-0">
 					<UserAvatar src={row.profile_pic} alt={row.username} size={56} />
 				</div>
 
@@ -47,9 +47,9 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 					<div className="text-xs sm:text-sm text-white/60">{(row.mindshare ?? 0).toFixed(1)}% mindshare</div>
 				</div>
 
-				<div className="text-right min-w-[60px]">
-					<div className="text-sm sm:text-base font-semibold">{row.followers.toLocaleString()}</div>
-					<div className="text-[10px] sm:text-xs text-white/60">followers</div>
+				<div className="text-right ml-auto min-w-[90px] whitespace-nowrap">
+					<div className="text-sm sm:text-base font-semibold leading-none">{row.followers.toLocaleString()}</div>
+					<div className="text-[10px] sm:text-xs text-white/60 leading-none mt-1">followers</div>
 				</div>
 			</div>
 		</motion.div>

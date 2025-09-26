@@ -27,19 +27,19 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 	print(f"Searching for tweets with query: {query}")
 	print(f"Since: {since}")
 	print(f"Limit: {limit}")
-	
+
 	# Twitter API credentials (you'll need to set these)
-	BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
+	BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")																																																																																														
 	
-		if not BEARER_TOKEN:
+																																																													if not BEARER_TOKEN:
 			print("No Twitter Bearer Token found. Skipping API fetch (no mock).")
 			# Do not produce mock data to avoid fake entries
-			mock_tweets = []
+			mock_tweets = []																																																		
 		usernames = [
 			"@samuelxeus", "@blockfestafrica", "@thenirvanacad", "@xeusthegreat",
 			"@crypto_king", "@web3_dev", "@blockchain_builder", "@defi_enthusiast", 
 			"@nft_creator", "@dao_member", "@metaverse_builder", "@layer2_expert",
-			"@consensus_engineer", "@smart_contract_dev", "@dapp_builder", "@crypto_trader",
+			"@consensus_engineer", "@smart_contract_dev", "@dapp_builder", "@crypto_trader",																																					
 			"@blockchain_analyst", "@web3_consultant", "@defi_researcher", "@nft_artist"
 		]
 		

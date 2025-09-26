@@ -1,0 +1,15 @@
+{
+  "services": {
+    "scraper": {
+      "path": "worker",
+      "start": "python snscrape_scraper.py",
+      "envVars": [
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE",
+        "KEYWORDS",
+        "SCRAPE_SINCE_HOURS"
+      ]
+    }
+  }
+}
+

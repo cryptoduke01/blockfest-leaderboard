@@ -1,2 +1,2 @@
-worker: python snscrape_scraper.py
+worker: python3 snscrape_scraper.py
 

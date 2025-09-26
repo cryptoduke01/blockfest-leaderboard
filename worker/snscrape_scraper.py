@@ -19,6 +19,9 @@ from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 import requests
+import urllib.parse
+import xml.etree.ElementTree as ET
+from email.utils import parsedate_to_datetime
 import psycopg2
 from psycopg2.extras import execute_values
 
@@ -34,18 +37,14 @@ load_dotenv(dotenv_path="../.env.local")
 
 DB_URL = os.getenv("SUPABASE_DB_URL")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_R                                                                                                                                                                        OLE")
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE")
 SINCE_HOURS = int(os.getenv("SCRAPE_SINCE_HOURS", "24"))
 LIMIT = int(os.getenv("SCRAPE_LIMIT", "200"))
-KEYWORDS = os.getenv(
-    "KEYWORDS",
-    # Comprehensive Blockfest terms (aligned with scrape_blockfest.py and API scoring keywords)
-    "(
-      \"blockfest africa\" OR blockfestafrica OR #blockfestafrica OR #blockfest OR blockfest OR blockf3st OR b3a OR
-      \"web3 africa\" OR \"blockchain africa\" OR \"africa web3\" OR \"web3 festival\" OR \"blockchain conference\" OR \"crypto festival\" OR
-      buidl OR bridge OR become OR \"web3 in motion\" OR \"unlocking africa\" OR \"african builders\" OR \"african creators\" OR \"african developers\"
-    )",
-)
+
+# Build a safe single-line default keyword string to avoid syntax issues
+DEFAULT_KEYWORDS = '("blockfest africa" OR blockfestafrica OR #blockfestafrica OR #blockfest OR blockfest OR blockf3st OR b3a OR "web3 africa" OR "blockchain africa" OR "africa web3" OR "web3 festival" OR "blockchain conference" OR "crypto festival" OR buidl OR bridge OR become OR "web3 in motion" OR "unlocking africa" OR "african builders" OR "african creators" OR "african developers")'
+
+KEYWORDS = os.getenv("KEYWORDS", DEFAULT_KEYWORDS)
 LAST_RUN_FILE = os.path.join(os.path.dirname(__file__), ".last_scrape_at")
 
 
@@ -70,7 +69,55 @@ def fetch_tweets(limit: int):
     if not sntwitter:
         print("snscrape python module unavailable in this runtime. Skipping scrape.")
         return
-    for item in sntwitter.TwitterSearchScraper(query).get_items():
+    try:
+        for item in sntwitter.TwitterSearchScraper(query).get_items():
+            # Skip retweets
+            try:
+                if getattr(item, "retweetedTweet", None) is not None:
+                    continue
+            except Exception:
+                pass
+
+            data = {
+                "tweet_id": str(item.id),
+                "username": f"@{item.user.username}" if item.user and item.user.username else "",
+                "profile_pic": getattr(item.user, "profileImageUrl", None)
+                or "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
+                "text": item.rawContent if hasattr(item, "rawContent") else getattr(item, "content", ""),
+                "date": item.date,
+                # snscrape provides likeCount/retweetCount/replyCount/quoteCount on Tweet
+                "likes": int(getattr(item, "likeCount", 0) or 0),
+                "retweets": int(getattr(item, "retweetCount", 0) or 0),
+                "replies": int(getattr(item, "replyCount", 0) or 0),
+                "quotes": int(getattr(item, "quoteCount", 0) or 0),
+                # Followers not directly available via snscrape; will try enrich via user page scrape below
+                "followers": 0,
+            }
+
+            # Try to enrich followers by scraping the user's profile page lightweightly
+            try:
+                if data["username"].startswith("@"):
+                    handle = data["username"][1:]
+                    # Use Nitter mirror for lightweight scrape if available
+                    nitter_url = f"https://nitter.net/{handle}"
+                    r = requests.get(nitter_url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                    if r.status_code == 200:
+                        # crude parse for followers count
+                        import re
+                        m = re.search(r"([0-9,.]+)\s*Followers", r.text)
+                        if m:
+                            followers_text = m.group(1).replace(",", "")
+                            data["followers"] = int(float(followers_text))
+            except Exception:
+                pass
+
+            yield data
+            count += 1
+            if count >= limit:
+                break
+    except Exception as e:
+        print("snscrape failed, falling back to Nitter RSS:", e)
+        return
         # Skip retweets
         try:
             if getattr(item, "retweetedTweet", None) is not None:
@@ -115,6 +162,66 @@ def fetch_tweets(limit: int):
         count += 1
         if count >= limit:
             break
+
+
+def fetch_via_nitter(limit: int):
+    queries = [
+        '"blockfest africa"', '#blockfestafrica', '#blockfest', 'blockfest', 'blockf3st',
+        '"web3 africa"', '"blockchain africa"', '"africa web3"', '"web3 festival"', '"blockchain conference"', '"crypto festival"',
+        'buidl', 'bridge', 'become', '"web3 in motion"', '"unlocking africa"', '"african builders"', '"african creators"', '"african developers"'
+    ]
+    seen = set()
+    collected = 0
+    for q in queries:
+        try:
+            url = f"https://nitter.net/search/rss?f=tweets&q={urllib.parse.quote(q)}"
+            resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                continue
+            root = ET.fromstring(resp.text)
+            for item in root.findall('.//item'):
+                link = item.findtext('link') or ''
+                title = item.findtext('title') or ''
+                pub = item.findtext('{http://purl.org/dc/elements/1.1/}date') or item.findtext('pubDate') or ''
+                # extract handle and id from link like https://nitter.net/handle/status/123
+                handle = ''
+                tweet_id = ''
+                try:
+                    parts = urllib.parse.urlparse(link)
+                    segs = parts.path.strip('/').split('/')
+                    if len(segs) >= 3 and segs[1] == 'status':
+                        handle = segs[0]
+                        tweet_id = segs[2]
+                except Exception:
+                    pass
+                username = f"@{handle}" if handle else ''
+                if tweet_id and tweet_id in seen:
+                    continue
+                seen.add(tweet_id)
+                # Basic text: title often like 'handle: content'
+                text = title.split(':', 1)[1].strip() if ':' in title else title
+                try:
+                    date = parsedate_to_datetime(pub) if pub else datetime.now(timezone.utc)
+                except Exception:
+                    date = datetime.now(timezone.utc)
+                row = {
+                    "tweet_id": tweet_id or link,
+                    "username": username,
+                    "profile_pic": "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
+                    "text": text,
+                    "date": date,
+                    "likes": 0,
+                    "retweets": 0,
+                    "replies": 0,
+                    "quotes": 0,
+                    "followers": 0,
+                }
+                yield row
+                collected += 1
+                if collected >= limit:
+                    return
+        except Exception:
+            continue
 
 
 def insert_rows_via_rest(rows):
@@ -205,8 +312,11 @@ def main():
 
     rows = list(fetch_tweets(LIMIT))
     if not rows:
-        print("No tweets fetched via snscrape")
-        return
+        print("No tweets fetched via snscrape; trying Nitter RSS fallback...")
+        rows = list(fetch_via_nitter(LIMIT))
+        if not rows:
+            print("No tweets fetched via Nitter RSS either.")
+            return
 
     inserted = 0
     if DB_URL:

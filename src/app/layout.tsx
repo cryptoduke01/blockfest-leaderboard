@@ -22,10 +22,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <link
-        href="https://fonts.cdnfonts.com/css/br-sonoma"
-        rel="stylesheet"
-      ></link>
+      <head>
+        <link
+          href="https://fonts.cdnfonts.com/css/br-sonoma"
+          rel="stylesheet"
+          precedence="default"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
         <footer className="mt-16 text-center py-6 text-white/60 text-sm space-x-1">

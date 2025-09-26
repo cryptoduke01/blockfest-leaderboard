@@ -85,19 +85,19 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
-		const { data: tweets, error } = await supabaseAdmin
-			.from("tweets")
-			.select("tweet_id, username, profile_pic, text, date, likes, retweets, replies, quotes, followers")
-			.gte("date", sinceIso)
-			.order("date", { ascending: false })
-			.limit(100);
+    const { data: tweets, error } = await supabaseAdmin
+            .from("tweets")
+            .select("tweet_id, username, profile_pic, text, date, likes, retweets, replies, quotes, followers")
+            // show everything in DB (no date window) while seeding
+            .order("date", { ascending: false })
+            .limit(500);
 
 		if (error || !tweets || tweets.length === 0) {
 			return NextResponse.json([], { status: 200 });
 		}
 
 		const defaultAvatar = "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
-		const seen = new Set<string>();
+        const seen = new Set<string>();
 		const users: {
 			username: string;
 			profile_pic: string;
@@ -112,18 +112,13 @@ export async function GET(req: NextRequest) {
 		}[] = [];
 
 		for (const t of tweets) {
-			const key = t.username as string;
-			if (seen.has(key)) continue; // only first tweet per user in this pull
-			seen.add(key);
+            const key = t.username as string;
+            // allow multiple entries per user during seeding (disable unique-per-user guard)
+            // if (seen.has(key)) continue;
+            // seen.add(key);
 
-			// Follower threshold filter (250+ followers only)
-			if ((t.followers || 0) < 250) continue;
-
-			// Calculate content quality
-			const contentQuality = calculateContentQuality(t.text || '');
-			
-			// Skip low-quality content (unless special account)
-			if (contentQuality < 20 && !isSpecialAccount(key)) continue;
+            // Calculate content quality (no filtering during seeding)
+            const contentQuality = calculateContentQuality(t.text || '');
 
 			// NEW SCORING ALGORITHM
 			// 1. Impressions simulation (40% weight) - using likes as proxy
