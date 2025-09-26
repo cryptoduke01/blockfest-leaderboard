@@ -34,7 +34,7 @@ export default function LeaderboardPage() {
 	// Filter rows based on search query
 	const filteredRows = useMemo(() => {
 		if (!searchQuery.trim()) return rows;
-		return rows.filter(row => 
+		return rows.filter(row =>
 			row.username.toLowerCase().includes(searchQuery.toLowerCase())
 		);
 	}, [rows, searchQuery]);

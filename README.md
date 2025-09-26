@@ -63,26 +63,42 @@ insert into public.tweets (tweet_id, username, profile_pic, text, date, likes, r
 on conflict (tweet_id) do nothing;
 ```
 
-## Scraper (no X sign-in needed)
+## Scrapers
 
-- snscrape does not require API keys.
-- Uses Supabase Postgres connection string (DB URL) to insert rows.
+### snscrape (no X API keys)
 
-Setup and run locally:
+- Uses `snscrape` to fetch public tweets without API keys and inserts via Supabase REST.
+- Respects keywords from `KEYWORDS` env and timeframe from `SCRAPE_SINCE_HOURS`.
+
+Run locally:
 
 ```bash
 cd worker
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-# copy DB URL from Supabase: Settings → Database → Connection string (Pooler/Direct, disable sslmode=require if needed)
-export SUPABASE_DB_URL='postgres://USER:PASSWORD@HOST:PORT/postgres'
-python scrape_blockfest.py
+cp ../env.example ../.env.local # fill SUPABASE_URL, SUPABASE_SERVICE_ROLE, optional KEYWORDS
+python snscrape_scraper.py
 ```
+
+Recommended cron (hourly):
+
+```bash
+0 * * * * /home/duke-sol/Desktop/workspace/blockestboard/worker/.venv/bin/python /home/duke-sol/Desktop/workspace/blockestboard/worker/snscrape_scraper.py
+```
+
+### Tweepy (optional, with API keys)
+
+- `worker/scrape_blockfest.py` and `worker/smart_scraper.py` use Twitter API if `TWITTER_BEARER_TOKEN` is set.
+- Falls back to mock data when rate-limited.
 
 ## Deploy
 
 - App: push repo → connect to Vercel
-- Worker: deploy `worker/` to Railway as a Python service; set env SUPABASE_DB_URL; add cron every 5 minutes
+- Worker (Railway):
+  - Service: Deploy `worker/` as Python with runtime `python-3.10.13` (see `worker/runtime.txt`).
+  - Command: `python snscrape_scraper.py` (see `worker/Procfile`).
+  - Env: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE`, optional `KEYWORDS`, `SCRAPE_SINCE_HOURS=1`.
+  - Schedule: Add a Railway cron to run hourly.
                                                                                                                                                                                       
 ## Cache job (optional)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 

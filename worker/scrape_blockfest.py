@@ -31,10 +31,10 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 	# Twitter API credentials (you'll need to set these)
 	BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
 	
-	if not BEARER_TOKEN:
-		print("No Twitter Bearer Token found. Using mock data...")
-		# Generate more realistic mock data with special accounts
-		mock_tweets = []
+		if not BEARER_TOKEN:
+			print("No Twitter Bearer Token found. Skipping API fetch (no mock).")
+			# Do not produce mock data to avoid fake entries
+			mock_tweets = []
 		usernames = [
 			"@samuelxeus", "@blockfestafrica", "@thenirvanacad", "@xeusthegreat",
 			"@crypto_king", "@web3_dev", "@blockchain_builder", "@defi_enthusiast", 
@@ -81,18 +81,46 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 		# Initialize Twitter API v2 client
 		client = tweepy.Client(bearer_token=BEARER_TOKEN)
 		
-		# Search for tweets
-		search_query = query
-		tweets = client.search_recent_tweets(
-			query=search_query,
-			max_results=min(limit, 100),  # Twitter API limit
-			tweet_fields=['created_at', 'public_metrics', 'author_id'],
-			user_fields=['username', 'profile_image_url', 'public_metrics'],
-			expansions=['author_id']
-		)
+		# Try multiple smaller queries to avoid rate limits
+		queries = [
+			"blockfest africa -is:retweet lang:en",
+			"#blockfestafrica -is:retweet lang:en", 
+			"blockfest -is:retweet lang:en"
+		]
 		
-		if not tweets.data:
-			print("No tweets found. Using mock data...")
+		all_tweets = []
+		users_dict = {}
+		
+		for search_query in queries:
+			try:
+				print(f"Trying query: {search_query}")
+				tweets = client.search_recent_tweets(
+					query=search_query,
+					max_results=min(limit, 20),  # Very small batches
+					tweet_fields=['created_at', 'public_metrics', 'author_id'],
+					user_fields=['username', 'profile_image_url', 'public_metrics'],
+					expansions=['author_id']
+				)
+				
+				if tweets.data:
+					users = {user.id: user for user in tweets.includes.get('users', [])}
+					users_dict.update(users)
+					all_tweets.extend(tweets.data)
+					print(f"Found {len(tweets.data)} tweets for query: {search_query}")
+				
+				# Small delay between queries
+				time.sleep(2)
+				
+			except Exception as e:
+				if '429' in str(e):
+					print(f"Rate limited on query: {search_query}")
+					break
+				else:
+					print(f"Error on query {search_query}: {e}")
+					continue
+		
+		if not all_tweets:
+			print("No tweets found from any query. Using mock data...")
 			# Fallback to mock data
 			mock_tweets = [
 				{
@@ -111,23 +139,31 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 			]
 			
 			for tweet in mock_tweets:
-				yield tweet
+				pass
 			return
 		
-		# Process real tweets
-		users = {user.id: user for user in tweets.includes.get('users', [])}
-		
-		for tweet in tweets.data:
-			user = users.get(tweet.author_id)
+		# Process all collected tweets
+		seen_users = set()
+		for tweet in all_tweets:
+			user = users_dict.get(tweet.author_id)
 			if not user:
 				continue
-				
+			
+			username = f"@{user.username}"
+			if username in seen_users:
+				continue  # Skip duplicate users
+			seen_users.add(username)
+			
 			metrics = tweet.public_metrics
 			user_metrics = user.public_metrics
 			
+			# Only include users with 250+ followers
+			if user_metrics.get('followers_count', 0) < 250:
+				continue
+			
 			tweet_data = {
 				"id": str(tweet.id),
-				"username": f"@{user.username}",
+				"username": username,
 				"profile_pic": user.profile_image_url or "https://i.pravatar.cc/100",
 				"content": tweet.text,
 				"date": tweet.created_at,
@@ -142,9 +178,9 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 			yield tweet_data
 			
 	except Exception as e:
-		print(f"Error fetching tweets: {e}")
-		print("Falling back to mock data...")
-		mock_tweets = [
+	print(f"Error fetching tweets: {e}")
+	print("Skipping fallback mock data.")
+	mock_tweets = [
 			{
 				"id": f"error_fallback_{i}",
 				"username": f"@blockfest_user_{i}",
@@ -160,8 +196,8 @@ def fetch_tweets(query: str, since: datetime, limit: int):
 			for i in range(1, min(limit + 1, 11))																																																																																																																																																																						
 		]
 
-		for tweet in mock_tweets:
-			yield tweet
+	for tweet in mock_tweets:
+		pass
 
 
 def to_row(tweet):

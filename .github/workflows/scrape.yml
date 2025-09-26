@@ -2,7 +2,7 @@ name: Scrape Blockfest Tweets
 
 on:
   schedule:
-    - cron: '0 0 * * *' # daily at 00:00 UTC
+    - cron: '0 6 * * *' # daily at 06:00 UTC (better for rate limits)
   workflow_dispatch: {}
 
 jobs:

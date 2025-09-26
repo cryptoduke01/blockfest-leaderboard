@@ -22,10 +22,36 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <link
+        href="https://fonts.cdnfonts.com/css/br-sonoma"
+        rel="stylesheet"
+      ></link>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
-        <footer className="mt-16 text-center py-6 text-white/60 text-sm">
-          Built by <span className="text-white font-semibold">duke.sol</span> • <a className="underline hover:text-white" href="https://x.com/cryptoduke01" target="_blank" rel="noreferrer">@cryptoduke01</a>
+        <footer className="mt-16 text-center py-6 text-white/60 text-sm space-x-1">
+          <span>
+            Built by{" "}
+            <a
+              href="https://x.com/cryptoduke01"
+              target="_blank"
+              rel="noreferrer"
+              className="text-white font-semibold hover:underline"
+            >
+              duke.sol
+            </a>
+          </span>
+          <span>•</span>
+          <span>
+            Made with ❤️ for{" "}
+            <a
+              href="https://blockfestafrica.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-white hover:underline"
+            >
+              Blockfest Africa
+            </a>
+          </span>
         </footer>
       </body>
     </html>
