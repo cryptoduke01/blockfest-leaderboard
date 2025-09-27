@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { LeaderboardRow } from "@/types/leaderboard";
 import { UserAvatar } from "@/components/UserAvatar";
+import ShareRankButton from "@/components/ShareRankButton";
 
 export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
   return (
@@ -13,7 +14,7 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
               <th className="py-4 px-6 text-left text-sm font-semibold text-white/80 uppercase tracking-wider">Rank</th>
               <th className="py-4 px-6 text-left text-sm font-semibold text-white/80 uppercase tracking-wider">Creator</th>
               <th className="py-4 px-6 text-right text-sm font-semibold text-white/80 uppercase tracking-wider">Mindshare</th>
-              <th className="py-4 px-6 text-right text-sm font-semibold text-white/80 uppercase tracking-wider">Followers</th>
+              <th className="py-4 px-6 text-center text-sm font-semibold text-white/80 uppercase tracking-wider">Share</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -34,7 +35,15 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                   </div>
                 </td>
                 <td className="py-4 px-6 text-right"><div className="text-sm font-semibold">{(r.mindshare ?? 0).toFixed(2)}%</div></td>
-                <td className="py-4 px-6 text-right"><div className="text-white/80 font-medium">{r.followers.toLocaleString()}</div><div className="text-xs text-white/60">followers</div></td>
+                <td className="py-4 px-6 text-center">
+                  <ShareRankButton 
+                    rank={r.rank}
+                    username={r.username}
+                    name={r.name || r.username}
+                    followers={r.followers}
+                    mindshare={r.mindshare || 0}
+                  />
+                </td>
               </motion.tr>
             ))}
           </tbody>
@@ -57,7 +66,7 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-[11px] text-white/60">{r.followers.toLocaleString()} followers</div>
+                <div className="text-[11px] text-white/60">{(r.mindshare ?? 0).toFixed(1)}% mindshare</div>
               </div>
             </motion.div>
           ))}

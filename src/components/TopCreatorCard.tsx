@@ -2,6 +2,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { LeaderboardRow } from "@/types/leaderboard";
 import { UserAvatar } from "@/components/UserAvatar";
+import ShareRankButton from "@/components/ShareRankButton";
 
 export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 	const getRankColor = (rank: number) => {
@@ -48,9 +49,20 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 				</div>
 
 				<div className="text-right ml-auto min-w-[96px] whitespace-nowrap">
-					<div className="text-sm sm:text-base font-semibold leading-none">{row.followers.toLocaleString()}</div>
-					<div className="text-[10px] sm:text-xs text-white/60 leading-none mt-1">followers</div>
+					<div className="text-sm sm:text-base font-semibold leading-none">{(row.mindshare ?? 0).toFixed(1)}%</div>
+					<div className="text-[10px] sm:text-xs text-white/60 leading-none mt-1">mindshare</div>
 				</div>
+			</div>
+			
+			{/* Share Button */}
+			<div className="mt-4 flex justify-end">
+				<ShareRankButton 
+					rank={row.rank}
+					username={row.username}
+					name={row.name || row.username}
+					followers={row.followers}
+					mindshare={row.mindshare || 0}
+				/>
 			</div>
 		</motion.div>
 	);

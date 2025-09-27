@@ -1,6 +1,7 @@
 export type LeaderboardRow = {
 	rank: number;
 	username: string;
+	name?: string;
 	profile_pic: string;
 	score: number;
 	mindshare?: number;
