@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
 	try {
     const { data: tweets, error } = await supabaseAdmin
             .from("tweets")
-            .select("tweet_id, username, profile_pic, text, date, likes, retweets, replies, quotes, followers")
+            .select("tweet_id, username, name, profile_pic, text, date, likes, retweets, replies, quotes, followers")
             // show everything in DB (no date window) while seeding
             .order("date", { ascending: false })
             .limit(500);
@@ -100,6 +100,7 @@ export async function GET(req: NextRequest) {
         const seen = new Set<string>();
 		const users: {
 			username: string;
+			name: string;
 			profile_pic: string;
 			score: number;
 			tweets: number;
@@ -143,6 +144,7 @@ export async function GET(req: NextRequest) {
 
 			users.push({
 				username: key,
+				name: (t.name as string) || key,
 				profile_pic: (t.profile_pic as string) || defaultAvatar,
 				score: finalScore,
 				tweets: 1,
@@ -163,6 +165,7 @@ export async function GET(req: NextRequest) {
 			rank: i + 1,
 			mindshare: +((u.score / total) * 100).toFixed(2),
 			username: u.username,
+			name: u.name,
 			profile_pic: u.profile_pic,
 			score: u.score,
 			tweets: u.tweets,

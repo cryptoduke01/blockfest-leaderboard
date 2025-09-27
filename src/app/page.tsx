@@ -108,8 +108,25 @@ export default function LeaderboardPage() {
 					</div>
 				</motion.header>
 
-					{/* Search Bar moved to right of Top 100 section header */}
-				{/* removed the first long search bar */}
+					{/* Search Bar - Always visible */}
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.2 }}
+					className="mb-8"
+				>
+					<div className="flex items-center justify-center">
+						<div className="w-full max-w-md">
+							<input
+								type="text"
+								placeholder="Search creators by username..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50"
+							/>
+						</div>
+					</div>
+				</motion.div>
 
 				{/* Loading state */}
 				<AnimatePresence>
@@ -180,28 +197,18 @@ export default function LeaderboardPage() {
 								</div>
 							</section>
 
-							{/* Full Leaderboard Table (Positions 4-100) */}
+							{/* Full Leaderboard Table (Positions 3+) */}
 							{rest.length > 0 && (
 								<section>
-										<motion.div className="flex items-center justify-between gap-4"
+									<motion.h2
 										initial={{ opacity: 0, x: -20 }}
 										animate={{ opacity: 1, x: 0 }}
 										transition={{ duration: 0.6, delay: 0.6 }}
-										>
-											<h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-												<span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-black text-sm">📋</span>
-												Full Leaderboard (Top 100)
-											</h2>
-											<div className="mb-8 w-full max-w-sm">
-												<input
-													type="text"
-													placeholder="Search creators by username..."
-													value={searchQuery}
-													onChange={(e) => setSearchQuery(e.target.value)}
-													className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50"
-												/>
-											</div>
-										</motion.div>
+										className="text-2xl font-bold text-white mb-8 flex items-center gap-3"
+									>
+										<span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-black text-sm">📋</span>
+										Full Leaderboard (Top 100)
+									</motion.h2>
 									<motion.div
 										initial={{ opacity: 0, y: 20 }}
 										animate={{ opacity: 1, y: 0 }}

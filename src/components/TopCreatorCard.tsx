@@ -43,9 +43,9 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 
 				<div className="flex-1 min-w-0 pr-6">
 					<Link href={`https://x.com/${handle}`} target="_blank" className="font-bold text-base sm:text-lg hover:text-yellow-400 block whitespace-normal break-words leading-tight">
-						{row.username}
+						{row.name || row.username}
 					</Link>
-					<div className="text-xs sm:text-sm text-white/60 mt-0.5">{(row.mindshare ?? 0).toFixed(1)}% mindshare</div>
+					<div className="text-xs text-white/60 mt-0.5">{row.username}</div>
 				</div>
 
 				<div className="text-right ml-auto min-w-[96px] whitespace-nowrap">
@@ -62,6 +62,7 @@ export function TopCreatorCard({ row }: { row: LeaderboardRow }) {
 					name={row.name || row.username}
 					followers={row.followers}
 					mindshare={row.mindshare || 0}
+					profilePic={row.profile_pic}
 				/>
 			</div>
 		</motion.div>

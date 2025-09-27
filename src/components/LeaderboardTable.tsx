@@ -28,9 +28,9 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                     <div className="rounded-xl overflow-hidden"><UserAvatar src={r.profile_pic} alt={r.username} size={40} /></div>
                     <div>
                       <Link href={`https://x.com/${r.username.replace(/^@/, "")}`} target="_blank" className="font-medium text-white hover:text-yellow-400 transition-colors duration-200">
-                        {r.username}
+                        {r.name || r.username}
                       </Link>
-                      <div className="text-xs text-white/60">X Creator</div>
+                      <div className="text-xs text-white/60">{r.username}</div>
                     </div>
                   </div>
                 </td>
@@ -42,6 +42,7 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                     name={r.name || r.username}
                     followers={r.followers}
                     mindshare={r.mindshare || 0}
+                    profilePic={r.profile_pic}
                   />
                 </td>
               </motion.tr>
@@ -59,14 +60,24 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                   <div className="rounded-xl overflow-hidden"><UserAvatar src={r.profile_pic} alt={r.username} size={32} /></div>
                   <div>
                     <Link href={`https://x.com/${r.username.replace(/^@/, "")}`} target="_blank" className="font-medium hover:text-yellow-400">
-                      {r.username}
+                      {r.name || r.username}
                     </Link>
-                    <div className="text-[11px] text-white/60">{(r.mindshare ?? 0).toFixed(0)}% mindshare</div>
+                    <div className="text-[11px] text-white/60">{r.username} • {(r.mindshare ?? 0).toFixed(0)}% mindshare</div>
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-[11px] text-white/60">{(r.mindshare ?? 0).toFixed(1)}% mindshare</div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <div className="text-[11px] text-white/60">{(r.mindshare ?? 0).toFixed(1)}% mindshare</div>
+                </div>
+                <ShareRankButton 
+                  rank={r.rank}
+                  username={r.username}
+                  name={r.name || r.username}
+                  followers={r.followers}
+                  mindshare={r.mindshare || 0}
+                  profilePic={r.profile_pic}
+                />
               </div>
             </motion.div>
           ))}
